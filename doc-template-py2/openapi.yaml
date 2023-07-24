@@ -1,0 +1,268 @@
+openapi: "3.0.2"
+info:
+  title: Distributives Mongo API
+  version: "1.0"
+servers:
+  - url: http://example.test.local:5700
+    description: Test stand
+paths:
+  /add_distributive:
+    post:
+      description: Add new distributive to Mongo DB
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                citype:
+                  type: string
+                  description: Distributive's ci type
+                  example: TPDSTR
+                version:
+                  type: string
+                  description: Distributive's version
+                  example: 1.10
+                path:
+                  type: string
+                  description: Distributive's path
+                  example: com.example.distr:testdstr:1.10:zip
+                checksum:
+                  type: string
+                  description: Distributive's md5 checksum
+                  example: 71e4fa836bfeff8936db700d317493d2
+                parent:
+                  type: string
+                  description: Distributive's parent (either path or checksum)
+                  example: f450467d56d83277e6dd7b09d7e637e3
+                is_deliverable:
+                  type: boolean
+                  description: Allowance for delivery status flag
+                  example: True
+                commentary:
+                  type: string
+                  description: User's commentary
+                  example: Forbidden since 18.03.21
+              required:
+                - path
+      responses:
+        "201":
+          description: Distributive was added successfully
+          content:
+            application/json:
+              schema:
+                  $ref: 'distributive.yaml#/components/schemas/distributive'
+        "400":
+            description: Neither changed status nor distributive path was provided
+            content:
+              application/json:
+                schema:
+                  type: string
+        "409":
+            description: Such distributive already exists in the DB
+            content:
+              application/json:
+                schema:
+                  type: string
+  /update_distributive:
+    post:
+      description: Update existing distributive's parameters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                distributive_id:
+                  type: string
+                  description: Either path or checksum
+                  example: com.example.testdstr:client:1.0.399:zip:os-x64
+                changes:
+                  type: object
+                  properties:
+                    citype:
+                      type: string
+                      description: Distributive's ci type
+                      example: WTFDSTR
+                    version:
+                      type: string
+                      description: Distributive's version
+                      example: 1.0.399
+                    path:
+                      type: string
+                      description: Distributive's path
+                      example: com.example.testdstr:client:1.0.399:zip:os-x64
+                    checksum:
+                      type: string
+                      description: Distributive's md5 checksum
+                      example: 6051d3d1c8e47278b75138ce
+                    parent:
+                      type: string
+                      description: Distributive's parent (either path or checksum)
+                      example: com.example.testdstr:client:1.0.360:zip:os-x64
+                    is_deliverable:
+                      type: boolean
+                      description: Allowance for delivery status flag
+                      example: False
+                    commentary:
+                      type: string
+                      description: User's commentary
+                      example: Forbidden since 18.03.21
+              required:
+                - distributive_id
+                - changes  
+      responses:
+        "201":
+          description: Distributive was updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: 'distributive.yaml#/components/schemas/distributive'
+        "400":
+            description: Neither changed status nor distributive id was provided
+            content:
+              application/json:
+                schema:
+                  type: string
+        "404":
+            description: Distributive doesn't exist in the DB
+            content:
+              application/json:
+                schema:
+                  type: string
+  /delete_distributive/{distributive}:
+    delete:
+      description: Delete the distributive from the DB
+      parameters:
+        - name: distributive
+          in: path
+          schema:
+            type: string
+          required: true
+          description: Either path or checksum
+          example: com.example.cmnd.ext.release_notes:wtf:1.0.399:txt
+      responses:
+        "200":
+          description: Distributive was deleted successfully
+          content:
+            application/json:
+              schema:
+                type: string
+        "404":
+          description: Distributive doesn't exist in the DB
+          content:
+            application/json:
+              schema:
+                type: string
+  /get_distributive/{distributive_id}:
+    get:
+      description: Get the specific distributive from the DB
+      parameters:
+        - name: distributive_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: Either path or checksum
+          example: 6051d3d1c8e47278b75138ce
+      responses:
+        "200":
+          description: Distributive's data returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: 'distributive.yaml#/components/schemas/distributive'
+        "404":
+          description: Distributive doesn't exist in the DB
+          content:
+            application/json:
+              schema:
+                type: string
+  /get_all_distributives:
+    get:
+      description: Get all distributives from the DB
+      parameters:
+        - name: is_deliverable
+          in: query
+          schema:
+            type: string
+          description: Is deliverable status filter
+          example: True
+      responses:
+        "200":
+          description: Distributives' data returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: 'distributive.yaml#/components/schemas/distributive'
+        "400":
+          description: Incorrect deliverable status flag was provided
+          content:
+            application/json:
+              schema:
+                type: string
+  /get_distributives_by_citype/{citype}:
+    get:
+      description: Get all distributives for specific ci type
+      parameters:
+        - name: citype
+          in: path
+          schema:
+            type: string
+          required: true
+          description: Distributives' ci type
+          example: WTFDSTR
+        - name: is_deliverable
+          in: query
+          schema:
+            type: string
+          description: Is deliverable status filter
+          example: True
+      responses:
+        "200":
+          description: Distributive's data returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: 'distributive.yaml#/components/schemas/distributive'
+        "400":
+          description: Incorrect deliverable status flag was provided
+          content:
+            application/json:
+              schema:
+                type: string
+  /get_distributive_revisions/{distributive_id}:
+    get:
+      description: Get all revisions (historical records) for the distributive
+      parameters:
+        - name: distributive_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: Either path or checksum
+          example: 6051d3d1c8e47278b75138ce
+      responses:
+        "200":
+          description: Distributive's revisions returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: 'distributive.yaml#/components/schemas/distributive'
+        "404":
+          description: Distributive doesn't exist in the DB
+          content:
+            application/json:
+              schema:
+                type: string
+  /get_revisions_paths:
+    get:
+      description: Get all unique paths from the revisions collection
+      responses:
+        "200":
+          description: unique paths were returned successfully
+          content:
+            application/json:
+              schema:
+                type: string
+                example: ["com.example.testdstr:client:1.0.399:zip:os-x64", "com.example.cmnd.ext.release_notes:testdstr:2.0.40:txt"]

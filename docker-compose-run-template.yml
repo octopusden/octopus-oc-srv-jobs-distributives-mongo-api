@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  distributives_mongo_api:
+    logging:
+      driver: "syslog"
+      options:
+        tag: "container_distributives_mongo_api_{{.ID}}"
+    restart: always
+    environment:
+      - MONGO_URL=${MONGO_URL}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_CONNECT_ATTEMPTS=${MONGO_CONNECT_ATTEMPTS:-5}
+    ports:
+      - "5700:5700"
+    image: ${DOCKER_REGISTRY_HOST}/octopusden/octopus-oc-srv-jobs-distributives-mongo-api:${TAG:-latest}
+  mongodb:
+    logging:
+      driver: "syslog"
+      options:
+        tag: "container_mongodb_{{.ID}}"
+    restart: always
+    environment:
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    image: ${DOCKER_REGISTRY_HOST}/octopusden/octopus-oc-srv-jobs-vm-mongodb:${TAG:-latest}
+    volumes:
+      - /local/db:/data/db

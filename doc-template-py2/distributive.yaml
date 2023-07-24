@@ -1,0 +1,46 @@
+components:
+  schemas:
+    distributive:
+      properties:
+        _id:
+          type: object
+          properties:
+            $oid:
+              type: string
+              example: 6051d3d2c8e47278b75138e0
+        revision:
+          type: integer
+          description: Distributive's state revision in the DB
+          example: 1
+        timestamp:
+          type: string
+          description: Timestamp of the last distributive's changes
+          example: 17-Mar-2021 10:02:58
+        citype:
+          type: string
+          description: Distributive's ci type
+          example: RELEASENOTES
+        version:
+          type: string
+          description: Distributive's version
+          example: 2.0.40
+        path:
+          type: string
+          description: Distributive's path
+          example: com.example.cmnd.ext.release_notes:testdstr:2.0.40:txt
+        checksum:
+          type: string
+          description: Distributive's md5 checksum
+          example: 1606c06697cc6ec2a9da9f67296168e5
+        parent:
+          type: string
+          description: Distributive's parent (either path or checksum)
+          example: com.example.cmnd.ext.release_notes:testdstr:2.0.38:txt
+        is_deliverable:
+          type: boolean
+          description: Allowance for delivery status flag
+          example: True
+        commentary:
+          type: string
+          description: User's commentary
+          example: Initial addition to the DB. Allowed for delivery
