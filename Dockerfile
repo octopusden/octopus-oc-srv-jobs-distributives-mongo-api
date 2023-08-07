@@ -1,5 +1,6 @@
 ARG DOCKER_REGISTRY_HOST=ghcr.io
 ARG TAG=latest
+ARG PYTHON_VERSION=3.7
 FROM ${DOCKER_REGISTRY_HOST}/octopusden/octopus-oc-srv-jobs-vm-mongodb:${TAG} as mongotest
 
 USER root
@@ -14,8 +15,7 @@ RUN rm -rf /build
 COPY --chown=root:root . /build
 WORKDIR /build
 
-RUN python3 -m pip install $(pwd) && \
-    python3 -m pip install coverage
+RUN python3 -m pip install $(pwd)
 
 ENV MONGO_INITDB_ROOT_USERNAME=test
 ENV MONGO_INITDB_ROOT_PASSWORD=test
@@ -23,12 +23,9 @@ ENV MONGO_INITDB_DATABASE=mongoenginetest
 
 RUN chmod 755 ./mongo_tests_in_docker.sh && ./mongo_tests_in_docker.sh 
 
-ARG PYTHON_VERSION=3.7
 FROM python:${PYTHON_VERSION}
 
 COPY . /build
-RUN mkdir -p /build/reports
-COPY --from=mongotest /build/coverage.xml /build/reports/distributives_mongo_api_coverage.xml
 
 WORKDIR /build
 RUN rm -rf mongo_tests*.sh && python -m pip install $(pwd)
