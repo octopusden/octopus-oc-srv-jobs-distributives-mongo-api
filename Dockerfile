@@ -21,7 +21,7 @@ ENV MONGO_INITDB_ROOT_USERNAME=test
 ENV MONGO_INITDB_ROOT_PASSWORD=test
 ENV MONGO_INITDB_DATABASE=mongoenginetest
 
-RUN chmod 755 ./mongo_tests_in_docker.sh && ./mongo_tests_in_docker.sh 
+RUN chmod 755 ./mongo_tests_in_docker.sh && ./mongo_tests_in_docker.sh
 
 FROM python:${PYTHON_VERSION}
 

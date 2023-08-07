@@ -27,6 +27,7 @@ then
 fi
 
 
+pwd
 python3 -m unittest discover -v
 RC="${?}"
 
