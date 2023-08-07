@@ -36,7 +36,7 @@ jobs:
       - name: Install and start MongoDB
         uses: supercharge/mongodb-github-action@1.2.0
         with:
-          mongodb-version: [ "${{ inputs.mongo_version }}" ]
+          mongodb-version: "${{ inputs.mongo_version }}"
           mongodb-username: ${{ inputs.mongo_initdb_root_username }}
           mongodb-password: ${{ inputs.mongo_initdb_root_password }}
           mongodb-db: ${{ inputs.mongo_initdb_database }}
