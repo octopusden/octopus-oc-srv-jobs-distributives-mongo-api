@@ -27,9 +27,11 @@ then
 fi
 
 
-pwd
-python3 -m unittest discover -v
+python3 -m coverage run -m unittest discover -v
 RC="${?}"
+pwd
+python3 -m coverage xml --include=./distributives_mongo_api/app/routes.py -o /build/coverage.xml
+test -f /build/coverage.xml || echo '<xml />' > /build/coverage.xml
 
 echo "Stopping mongo"
 kill $(pidof mongod)

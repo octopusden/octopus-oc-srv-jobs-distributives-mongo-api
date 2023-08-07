@@ -15,7 +15,7 @@ RUN rm -rf /build
 COPY --chown=root:root . /build
 WORKDIR /build
 
-RUN python3 -m pip install $(pwd)
+RUN python3 -m pip install coverage $(pwd)
 
 ENV MONGO_INITDB_ROOT_USERNAME=test
 ENV MONGO_INITDB_ROOT_PASSWORD=test
@@ -26,6 +26,9 @@ RUN chmod 755 ./mongo_tests_in_docker.sh && ./mongo_tests_in_docker.sh
 FROM python:${PYTHON_VERSION}
 
 COPY . /build
+
+RUN mkdir -p /build/reports
+COPY --from=mongotest /build/coverage.xml /build/reports/distributives_mongo_api_coverage.xml
 
 WORKDIR /build
 RUN rm -rf mongo_tests*.sh && python -m pip install $(pwd)
