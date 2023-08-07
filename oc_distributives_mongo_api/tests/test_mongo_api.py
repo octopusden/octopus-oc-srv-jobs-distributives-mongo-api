@@ -2364,7 +2364,7 @@ class MongoAPITest(unittest.TestCase):
                 continue
 
             for _i in range(0, _num_paths):
-                _local_path =  f"gg{_i}:aa{_i}:{random.randint(0,99)}:pp{_i}"
+                _local_path =  f"gg{_i}:{_citype.lower()}-{_i}:{random.randint(0,99)}:pp{_i}"
                 _local_md5 = self._md5('$'.join([ _local_path, _citype, _latest_version]))
                 _extend_distr = {
                         "changes": {
