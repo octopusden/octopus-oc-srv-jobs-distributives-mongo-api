@@ -2334,18 +2334,21 @@ class MongoAPITest(unittest.TestCase):
 
         for _i in range(0, _num_distrs):
             _client = _client_template % (_i%3) if _i%3 else None
-            _citype = _citype_template % (_i%3, "CLIENT" if _client else "")
+            _citype = _citype_template % (_i%5, "CLIENT" if _client else "")
             _all_distrs.append(self._make_distr_json(_i, client=_client, citype=_citype))
 
         _all_citypes = list(set(map(lambda x: x.get("citype"), _all_distrs)))
+        _latest_version = '100.00.101'
 
         for _citype in _all_citypes:
-            _path = '{}.last_path'.format(_citype)
-            _latest_version = '100.00.101'
+            if _citype.endswith('CLIENT'):
+                continue
+
+            _path = f"{_citype}.last_path:latest-artifact-id:${_latest_version}:ppp"
             _last_version = {
                     'path': _path,
-                    'citype': '{}'.format(_citype),
-                    'version': '100.00.101',
+                    'citype': _citype,
+                    'version': _latest_version,
                     'checksum':  self._md5('$'.join([ _path, _citype, _latest_version]))
             }
             _all_distrs.append(_last_version)
@@ -2357,23 +2360,26 @@ class MongoAPITest(unittest.TestCase):
         _num_paths = random.randint(2, 5)
 
         for _citype in _all_citypes:
+            if _citype.endswith('CLIENT'):
+                continue
+
             for _i in range(0, _num_paths):
-                _local_path =  f"gg{_i}:aa{_i}:{random.randint(0,99)}:pp{_i}"
-                _local_md5 = self._md5('$'.join([ _local_path, _citype, "100.00.101"]))
+                _local_path =  f"gg{_i}:{_citype.lower()}-{_i}:{random.randint(0,99)}:pp{_i}"
+                _local_md5 = self._md5('$'.join([ _local_path, _citype, _latest_version]))
                 _extend_distr = {
                         "changes": {
                             "path": _local_path,
                             "checksum": _local_md5
                         },
                         "citype": _citype,
-                        "version": "100.00.101"
+                        "version": _latest_version
                 }
                 _response = self.test_client.post(posixpath.join(posixpath.sep, "update_distributive"), json=_extend_distr)
                 self.assertEqual(201, _response.status_code)
 
         # check one ci_type
-        # check two ci_type
-        _ci_types_to_check = _all_citypes[:2]
+        # check two ci_types
+        _ci_types_to_check = list(filter(lambda x: not x.endswith('CLIENT'), _all_citypes))[:2]
         _url = posixpath.join(posixpath.sep, "versions_by_citype", "latest")
         self._check_new_ci_type_api(url=_url,
                 params={"ci_type": _ci_types_to_check[0]}, expected_results=1)

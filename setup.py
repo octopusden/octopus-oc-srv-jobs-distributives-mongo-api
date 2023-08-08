@@ -11,6 +11,8 @@ __version = "2.2.0"
 setup(name="oc-distributives-mongo-api",
       version=__version,
       description="Distributives HTTP API worker",
+      long_description="Checksums Mobgo-based distributives HTTP API service",
+      long_description_content_type="text/plain",
 
       install_requires=[
           "mongoengine >= 0.23",

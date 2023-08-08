@@ -1,0 +1,56 @@
+name: Python 3 build with real MongoDB and deploy to PyPI
+on: 
+  workflow_call:
+    inputs:
+      process_env:
+        required: true
+        type: string
+      mongo_version:
+        required: false
+        type: string
+        default: '5.0.2'
+      mongo_initdb_root_username:
+        required: false
+        type: string
+        default: 'test'
+      mongo_initdb_root_password:
+        required: false
+        type: string
+        default: test
+      mongo_initdb_database:
+        required: false
+        type: string
+        default: 'mongoenginetest'
+    secrets:
+      PYPI_API_TOKEN:
+        required: true
+jobs:
+  build-deploy-for-python3:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.process_env }}
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install and start MongoDB
+        uses: supercharge/mongodb-github-action@1.9.0
+        with:
+          mongodb-version: "${{ inputs.mongo_version }}"
+          mongodb-username: ${{ inputs.mongo_initdb_root_username }}
+          mongodb-password: ${{ inputs.mongo_initdb_root_password }}
+          mongodb-db: ${{ inputs.mongo_initdb_database }}
+      - name: Install setuptools
+        run: python3 -m pip install --upgrade pip setuptools wheel
+      - name: Setup
+        run: python3 setup.py sdist bdist_wheel
+      - name: Install and test
+        run: python3 -m pip install dist/*.whl && python3 -m unittest discover -v
+      - name: Remove tars
+        run: rm -f dist/*.tar.gz
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: false
+          repository-url: ${{ vars.PYPI_REPO_URL }}
