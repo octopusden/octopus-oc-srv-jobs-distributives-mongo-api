@@ -7,7 +7,7 @@ from .config import Config
 
 _settings = dict()
 
-for _s in ["url", "user", "password", "name", "connect_attempts"]:
+for _s in ["url", "user", "password", "db", "connect_attempts"]:
     _env = "_".join(["mongo", _s]).upper()
     _v = os.getenv(_env)
 
@@ -20,7 +20,7 @@ _i = 0
 while True:
     try:
         connect(
-                _settings["name"],
+                _settings["db"],
                 host=_settings["url"],
                 username=_settings["user"],
                 password=_settings["password"],
