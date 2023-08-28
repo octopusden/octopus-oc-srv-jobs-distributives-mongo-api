@@ -6,7 +6,7 @@ import sys
 if "test" in sys.argv:
     raise NotImplementedError("'python setup.py test' is buggy, please run as 'python -m unittest'")
 
-__version = "2.2.0"
+__version = "2.2.1"
 
 setup(name="oc-distributives-mongo-api",
       version=__version,

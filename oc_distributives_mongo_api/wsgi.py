@@ -17,7 +17,7 @@ for _s in ["url", "user", "password", "name", "connect_attempts"]:
     _settings[_s] = int(_v) if _s == "connect_attempts" else _v
 
 _i = 0
-while True
+while True:
     try:
         connect(
                 _settings["name"],
